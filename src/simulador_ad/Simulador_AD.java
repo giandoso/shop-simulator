@@ -45,8 +45,8 @@ public class Simulador_AD {
      */
     public static void main(String[] args) throws IOException {
         double tempo = 0.0;
-        double tempo_simulacao = 100000;
-        double tempo_medio_clientes = 1.0 / 0.25; // o tempo medio entre a chegada de clientes (segundos)
+        double tempo_simulacao = 1000000;
+        double tempo_medio_clientes = 1.0 / 0.5; // o tempo medio entre a chegada de clientes (segundos)
         
         /**
          * O tempo medio gasto para atender cada pessoa (segundos)
@@ -55,16 +55,13 @@ public class Simulador_AD {
          */
         
 //        double tempo_medio_atendimento = 1.0 / 0.2;   //  Ocupação == 40%
-        double tempo_medio_atendimento = 1.0 / 0.15;    //  Ocupação == 60%
 //        double tempo_medio_atendimento = 1.0 / 0.4;   //  Ocupação == 80%
 //        double tempo_medio_atendimento = 1.0 / 0.45;  //  Ocupação == 90%
-//        double tempo_medio_atendimento = 1.0 / 0.49;  //  Ocupação == 99%
+        double tempo_medio_atendimento = 1.0 / 0.499;  //  Ocupação == 99%
 
-//        double chegada_cliente = 0.0;
         double chegada_cliente = (double) ((-1.0/tempo_medio_clientes) * Math.log(aleatorio()));
         double tempo_inicial = chegada_cliente;
         
-        double tempo_plot_o = chegada_cliente;
         double tempo_plot_en = chegada_cliente;
         double tempo_plot_ewE = chegada_cliente;
         double tempo_plot_ewS = chegada_cliente;
@@ -115,11 +112,7 @@ public class Simulador_AD {
                     saida_atendimento = tempo;
                 }
 
-                // gerar o tempo de chegada do proximo cliente
-                // Em todos os cenários a chegada será de 
-                // 2 requisições por segundo
-//                chegada_cliente += 0.5;
-                chegada_cliente += tempo + (double) ((-1.0/tempo_medio_clientes) * Math.log(aleatorio()));
+                chegada_cliente = tempo + (-1.0/tempo_medio_clientes) * Math.log(aleatorio());
 
                 // calculo do E[N]
                 en.somaAreas += en.numeroEventos * (tempo - en.tempoAnterior);
@@ -153,7 +146,7 @@ public class Simulador_AD {
                 if (fila > 0.0) {
                     fila--;
 
-                    double tempo_atendimento = (double) (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
+                    double tempo_atendimento = (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
                     saida_atendimento = tempo + tempo_atendimento;
                     soma_atendimentos += tempo_atendimento;
                 } else {
@@ -193,18 +186,17 @@ public class Simulador_AD {
         ewEntrada.somaAreas += ewEntrada.numeroEventos * (tempo - ewEntrada.tempoAnterior);
 
         double enF = en.somaAreas / tempo;
-        double ew = (ewEntrada.somaAreas - ewSaida.somaAreas) / (double) ewEntrada.numeroEventos;
+        double ew = (ewEntrada.somaAreas - ewSaida.somaAreas) / ewEntrada.numeroEventos;
         double lambda = ewEntrada.numeroEventos / tempo;
         double ocupacao = soma_atendimentos / tempo;
 
-        System.out.printf("Ocupacao: %.13f  ~  %.2f porcento\n", ocupacao, ocupacao * 100.0);
-        System.out.println(tempo_medio_clientes / tempo_medio_atendimento);
+        System.out.printf("Ocupacao: %.2f porcento\n", ocupacao * 100.0);
         System.out.println("E[N]: " + enF);
         System.out.println("E[W]: " + ew);
         System.out.println("Lambda: " + lambda);
         //Little --> en = lambda * ew
         //Little --> en - lambda * ew ~ 0.0
-        System.out.printf("Validação de Little: %.13f\n", (Math.abs(enF - lambda * ew)));
+        System.out.printf("Validação de Little: %.20f\n", (Math.abs(enF - lambda * ew)));
 
         
         bw_o.close();
