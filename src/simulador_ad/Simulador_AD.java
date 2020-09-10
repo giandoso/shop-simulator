@@ -5,6 +5,10 @@
  */
 package simulador_ad;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -39,7 +43,7 @@ public class Simulador_AD {
      * Utilizacao ou Ocupacao = fracao de tempo que o caixa permanecera ocupado.
      * Little: E[N] = \lambda * E[w]
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 //        double tempo_medio_atendimento = 1.0 / 0.2; //  Ocupação == 40%
 //        double tempo_medio_atendimento = 1.0 / 0.4; //  Ocupação == 80%
 //        double tempo_medio_atendimento = 1.0 / 0.45; // Ocupação == 90%
@@ -61,6 +65,14 @@ public class Simulador_AD {
         Pacote en = new Pacote();
         Pacote ewEntrada = new Pacote();
         Pacote ewSaida = new Pacote();
+
+        
+        File f_en = new File("en.txt");
+        File f_ewE = new File("ewE.txt");
+        File f_ewS = new File("ewS.txt");
+        BufferedWriter bw_en = new BufferedWriter(new FileWriter(f_en));
+        BufferedWriter bw_ewE = new BufferedWriter(new FileWriter(f_ewE));
+        BufferedWriter bw_ewS = new BufferedWriter(new FileWriter(f_ewS));
 
         //logica da simulacao
         while (tempo <= tempo_simulacao) {
@@ -93,11 +105,15 @@ public class Simulador_AD {
                 en.somaAreas += en.numeroEventos * (tempo - en.tempoAnterior);
                 en.tempoAnterior = tempo;
                 en.numeroEventos++;
+                bw_en.append(en.somaAreas + "\t" + en.tempoAnterior + "\t" + en.numeroEventos + "\n");
 
+                
                 //calculo do E[W]
                 ewEntrada.somaAreas += ewEntrada.numeroEventos * (tempo - ewEntrada.tempoAnterior);
                 ewEntrada.tempoAnterior = tempo;
                 ewEntrada.numeroEventos++;
+                bw_ewE.append(ewEntrada.somaAreas + "\t" + ewEntrada.tempoAnterior + "\t" + ewEntrada.numeroEventos + "\n");
+
 
             } else {
                 //evento executado se houver saida de cliente
@@ -123,11 +139,13 @@ public class Simulador_AD {
                     en.somaAreas += en.numeroEventos * (tempo - en.tempoAnterior);
                     en.tempoAnterior = tempo;
                     en.numeroEventos--;
+                    bw_en.append(en.somaAreas + "\t" + en.tempoAnterior + "\t" + en.numeroEventos + "\n");
 
                     //calculo do E[W]
                     ewSaida.somaAreas += ewSaida.numeroEventos * (tempo - ewSaida.tempoAnterior);
                     ewSaida.tempoAnterior = tempo;
                     ewSaida.numeroEventos++;
+                    bw_ewS.append(ewSaida.somaAreas + "\t" + ewSaida.tempoAnterior + "\t" + ewSaida.numeroEventos + "\n");
                 }
             }
         }
@@ -149,8 +167,11 @@ public class Simulador_AD {
         System.out.println("E[W]: " + ew);
         //Little --> en = lambda * ew
         //Little --> en - lambda * ew ~ 0.0
-        System.out.printf("Validação Little: %.13f\n",(Math.abs(enF - lambda * ew)));
-        
+        System.out.printf("Validação Little: %.13f\n", (Math.abs(enF - lambda * ew)));
 
+        
+        bw_en.close();
+        bw_ewE.close();
+        bw_ewS.close();
     }
 }
