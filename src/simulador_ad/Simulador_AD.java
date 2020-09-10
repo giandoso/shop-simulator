@@ -19,8 +19,8 @@ public class Simulador_AD {
 
     // seed e funções auxiliares
     static long seed = 123456789;
-//    static Random generator = new Random(seed);
-    static Random generator = new Random(System.currentTimeMillis());
+    static Random generator = new Random(seed);
+//    static Random generator = new Random(System.currentTimeMillis());
 
     public static double aleatorio() {
         return 1.00 - generator.nextDouble();
@@ -62,6 +62,7 @@ public class Simulador_AD {
         double chegada_cliente = (double) ((-1.0/tempo_medio_clientes) * Math.log(aleatorio()));
         double tempo_inicial = chegada_cliente;
         
+        double tempo_plot_o = chegada_cliente;
         double tempo_plot_en = chegada_cliente;
         double tempo_plot_ewE = chegada_cliente;
         double tempo_plot_ewS = chegada_cliente;
@@ -85,7 +86,7 @@ public class Simulador_AD {
         File f_en = new File("en.txt");
         File f_ewE = new File("ewE.txt");
         File f_ewS = new File("ewS.txt");
-        BufferedWriter bw_o = new BufferedWriter(new FileWriter(f_en));
+        BufferedWriter bw_o = new BufferedWriter(new FileWriter(f_o));
         BufferedWriter bw_en = new BufferedWriter(new FileWriter(f_en));
         BufferedWriter bw_ewE = new BufferedWriter(new FileWriter(f_ewE));
         BufferedWriter bw_ewS = new BufferedWriter(new FileWriter(f_ewS));
@@ -149,6 +150,10 @@ public class Simulador_AD {
                     double tempo_atendimento = (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
                     saida_atendimento = tempo + tempo_atendimento;
                     soma_atendimentos += tempo_atendimento;
+                    if (tempo >= tempo_plot_o + 100.0 || tempo == tempo_inicial) {
+                        bw_o.append(tempo + "\t" + (soma_atendimentos / tempo) + "\n");
+                        tempo_plot_o = tempo; // ou tempo_plot += 100 ?
+                    }
                 } else {
                     saida_atendimento = 0.0;
                 }
