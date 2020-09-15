@@ -45,7 +45,7 @@ public class Simulador_AD {
      */
     public static void main(String[] args) throws IOException {
         double tempo = 0.0;
-        double tempo_simulacao = 1000000;
+        double tempo_simulacao = 100000;
         double tempo_medio_clientes = 1.0 / 0.5; // o tempo medio entre a chegada de clientes (segundos)
         
         /**
@@ -54,10 +54,10 @@ public class Simulador_AD {
          * TMA = Ocupacao * TMC
          */
         
-//        double tempo_medio_atendimento = 1.0 / 0.2;   //  Ocupação == 40%
-//        double tempo_medio_atendimento = 1.0 / 0.4;   //  Ocupação == 80%
-//        double tempo_medio_atendimento = 1.0 / 0.45;  //  Ocupação == 90%
-        double tempo_medio_atendimento = 1.0 / 0.499;  //  Ocupação == 99%
+        double tempo_medio_atendimento = 1.0 / 0.2;  int oc = 40; //  Ocupação == 40%
+//        double tempo_medio_atendimento = 1.0 / 0.4;  int oc = 80; //  Ocupação == 80%
+//        double tempo_medio_atendimento = 1.0 / 0.45; int oc = 90; //  Ocupação == 90%
+//        double tempo_medio_atendimento = 1.0 / 0.499;  int oc = 99; //  Ocupação == 99%
 
         double chegada_cliente = (double) ((-1.0/tempo_medio_clientes) * Math.log(aleatorio()));
         double tempo_inicial = chegada_cliente;
@@ -82,10 +82,10 @@ public class Simulador_AD {
         Pacote ewSaida = new Pacote();
 
         
-        File f_o = new File("o.txt");
-        File f_en = new File("en.txt");
-        File f_ewE = new File("ewE.txt");
-        File f_ewS = new File("ewS.txt");
+        File f_o = new File("out/o"+oc+".txt");
+        File f_en = new File("out/en"+oc+".txt");
+        File f_ewE = new File("out/ewE"+oc+".txt");
+        File f_ewS = new File("out/ewS"+oc+".txt");
         BufferedWriter bw_o = new BufferedWriter(new FileWriter(f_o));
         BufferedWriter bw_en = new BufferedWriter(new FileWriter(f_en));
         BufferedWriter bw_ewE = new BufferedWriter(new FileWriter(f_ewE));
