@@ -47,6 +47,7 @@ public class Simulador_AD {
         double tempo = 0.0;
         double tempo_simulacao = 100000;
         double tempo_medio_clientes = 1.0 / 0.5; // o tempo medio entre a chegada de clientes (segundos)
+        double intervalo_plot = 100.0;
         
         /**
          * O tempo medio gasto para atender cada pessoa (segundos)
@@ -82,10 +83,10 @@ public class Simulador_AD {
         Pacote ewSaida = new Pacote();
 
         
-        File f_o = new File("out/o"+oc+".txt");
-        File f_en = new File("out/en"+oc+".txt");
-        File f_ewE = new File("out/ewE"+oc+".txt");
-        File f_ewS = new File("out/ewS"+oc+".txt");
+        File f_o = new File("o"+oc+".txt");
+        File f_en = new File("en"+oc+".txt");
+        File f_ewE = new File("ewE"+oc+".txt");
+        File f_ewS = new File("ewS"+oc+".txt");
         BufferedWriter bw_o = new BufferedWriter(new FileWriter(f_o));
         BufferedWriter bw_en = new BufferedWriter(new FileWriter(f_en));
         BufferedWriter bw_ewE = new BufferedWriter(new FileWriter(f_ewE));
@@ -120,7 +121,7 @@ public class Simulador_AD {
                 en.tempoAnterior = tempo;
                 en.numeroEventos++;
                 // plot do E[N]
-                if (tempo >= tempo_plot_en + 100.0 || tempo == tempo_inicial) {
+                if (tempo >= tempo_plot_en + intervalo_plot || tempo == tempo_inicial) {
                     bw_en.append(en.tempoAnterior + "\t" + en.somaAreas + "\t" + en.numeroEventos + "\n");
                     tempo_plot_en = tempo; // ou tempo_plot += 100 ?
                 }
@@ -130,7 +131,7 @@ public class Simulador_AD {
                 ewEntrada.tempoAnterior = tempo;
                 ewEntrada.numeroEventos++;
                 // plot do E[W]
-                if (tempo >= tempo_plot_ewE + 100.0 || tempo == tempo_inicial) {
+                if (tempo >= tempo_plot_ewE + intervalo_plot || tempo == tempo_inicial) {
                     bw_ewE.append(ewEntrada.tempoAnterior + "\t" + ewEntrada.somaAreas + "\t" + ewEntrada.numeroEventos + "\n");
                     tempo_plot_ewE = tempo; // ou tempo_plot += 100 ?
                 }
@@ -150,7 +151,7 @@ public class Simulador_AD {
                     double tempo_atendimento = (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
                     saida_atendimento = tempo + tempo_atendimento;
                     soma_atendimentos += tempo_atendimento;
-                    if (tempo >= tempo_plot_o + 100.0 || tempo == tempo_inicial) {
+                    if (tempo >= tempo_plot_o + intervalo_plot || tempo == tempo_inicial) {
                         bw_o.append(tempo + "\t" + (soma_atendimentos / tempo) + "\n");
                         tempo_plot_o = tempo; // ou tempo_plot += 100 ?
                     }
@@ -164,7 +165,7 @@ public class Simulador_AD {
                     en.tempoAnterior = tempo;
                     en.numeroEventos--;
                     // plot do E[N]
-                    if (tempo >= tempo_plot_en + 100.0 || tempo == tempo_inicial) {
+                    if (tempo >= tempo_plot_en + intervalo_plot || tempo == tempo_inicial) {
                         bw_en.append(en.tempoAnterior + "\t" + en.somaAreas + "\t" + en.numeroEventos + "\n");
                         tempo_plot_en = tempo; // ou tempo_plot += 100 ?
                     }
@@ -174,7 +175,7 @@ public class Simulador_AD {
                     ewSaida.tempoAnterior = tempo;
                     ewSaida.numeroEventos++;
                     // plot do E[W]
-                    if (tempo >= tempo_plot_ewS + 100.0 || tempo == tempo_inicial) {
+                    if (tempo >= tempo_plot_ewS + intervalo_plot || tempo == tempo_inicial) {
                         bw_ewS.append(ewSaida.tempoAnterior + "\t" + ewSaida.somaAreas + "\t" +  ewSaida.numeroEventos + "\n");
                         tempo_plot_ewS = tempo; // ou tempo_plot += 100 ?
                     }
@@ -201,7 +202,8 @@ public class Simulador_AD {
         System.out.println("Lambda: " + lambda);
         //Little --> en = lambda * ew
         //Little --> en - lambda * ew ~ 0.0
-        System.out.printf("Validação de Little: %.20f\n", (Math.abs(enF - lambda * ew)));
+        System.out.printf("Little: |%.13f - (%.13f * %.13f)| = %.13f\n", enF , lambda , ew, (Math.abs(enF - lambda * ew)));
+//        System.out.printf("Validação de Little: %.20f\n", (Math.abs(enF - lambda * ew)));
 
         
         bw_o.close();
