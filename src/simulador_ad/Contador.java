@@ -9,7 +9,7 @@ package simulador_ad;
  *
  * @author giandoso
  */
-public class Pacote {
+public class Contador {
     int numeroEventos;
     double somaAreas;
     double tempoAnterior;

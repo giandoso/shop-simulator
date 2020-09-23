@@ -45,9 +45,17 @@ public class Simulador_AD {
      */
     public static void main(String[] args) throws IOException {
         double tempo = 0.0;
-        double tempo_simulacao = 100000;
-        double tempo_medio_clientes = 1.0 / 0.5; // o tempo medio entre a chegada de clientes (segundos)
-        double intervalo_plot = 100.0;
+        double tempo_simulacao = 1200000;
+//        double tempo_medio_clientes = 1.0 / 0.5; // o tempo medio entre a chegada de clientes (segundos)
+        double intervalo_plot = 600.0;
+        double soma_atendimentos = 0.0;
+        double fila = 0.0;
+        
+        
+        // variaveis para o calculo de E[N] e E[W]
+        Contador en = new Contador();
+        Contador ewEntrada = new Contador();
+        Contador ewSaida = new Contador();
         
         /**
          * O tempo medio gasto para atender cada pessoa (segundos)
@@ -55,62 +63,49 @@ public class Simulador_AD {
          * TMA = Ocupacao * TMC
          */
         
-        double tempo_medio_atendimento = 1.0 / 0.2;  int oc = 40; //  Ocupação == 40%
-//        double tempo_medio_atendimento = 1.0 / 0.4;  int oc = 80; //  Ocupação == 80%
-//        double tempo_medio_atendimento = 1.0 / 0.45; int oc = 90; //  Ocupação == 90%
-//        double tempo_medio_atendimento = 1.0 / 0.499;  int oc = 99; //  Ocupação == 99%
-
-        double chegada_cliente = (double) ((-1.0/tempo_medio_clientes) * Math.log(aleatorio()));
-        double tempo_inicial = chegada_cliente;
         
-        double tempo_plot_o = chegada_cliente;
-        double tempo_plot_en = chegada_cliente;
-        double tempo_plot_ewE = chegada_cliente;
-        double tempo_plot_ewS = chegada_cliente;
+        double qtd_caixas = 10.0;
+        Loja l = new Loja(qtd_caixas); 
+        double tempo_medio_atendimento = qtd_caixas / 60.0; 
+        double relacao_chegada_capacidade = 0.4;
+        double tempo_medio_clientes = relacao_chegada_capacidade * tempo_medio_atendimento;
+        
+        double chegada_cliente = (double) ((-1.0/tempo_medio_clientes) * Math.log(aleatorio()));
+        
+        
+//        double tempo_inicial = chegada_cliente;
+//        double tempo_plot_o = chegada_cliente;
+//        double tempo_plot_en = chegada_cliente;
+//        double tempo_plot_ewE = chegada_cliente;
+//        double tempo_plot_ewS = chegada_cliente;
 
-        // armazena o tempo em que o cliente que estiver em atendimento saira do comercio
-        // saida_atendimento == 0.0 indica caixa ocioso
-        double saida_atendimento = 0.0;
 
-        double fila = 0.0;
 
         // somar os tempos de atendimento, para no final calcularmos a ocupacao.        
-        double soma_atendimentos = 0.0;
 
-        // variaveis para o calculo de E[N] e E[W]
-        Pacote en = new Pacote();
-        Pacote ewEntrada = new Pacote();
-        Pacote ewSaida = new Pacote();
-
-        
-        File f_o = new File("o"+oc+".txt");
-        File f_en = new File("en"+oc+".txt");
-        File f_ewE = new File("ewE"+oc+".txt");
-        File f_ewS = new File("ewS"+oc+".txt");
-        BufferedWriter bw_o = new BufferedWriter(new FileWriter(f_o));
-        BufferedWriter bw_en = new BufferedWriter(new FileWriter(f_en));
-        BufferedWriter bw_ewE = new BufferedWriter(new FileWriter(f_ewE));
-        BufferedWriter bw_ewS = new BufferedWriter(new FileWriter(f_ewS));
 
         // logica da simulacao
         while (tempo <= tempo_simulacao) {
             // nao existe cliente sendo atendido no momento atual,
             // de modo que a simulacao pode avancar no tempo para
             // a chegada do proximo cliente
-            if (saida_atendimento == 0.0) {
+            if (l.hasFree()) { 
                 tempo = chegada_cliente;
             } else {
+                // checa se chegada cliente é menor do que saida_atendimento 
+                // de qualquer caixa da loja 
+                double saida_atendimento = l.getMin();
                 tempo = minimo(chegada_cliente, saida_atendimento);
             }
-
+            
             if (tempo == chegada_cliente) {
-                // evento de chegada de cliente
+                // evento de chegada de cliente 
                 fila++;
 
                 // indica que o caixa esta ocioso
                 // logo, pode-se comecar a atender
                 // o cliente que acaba de chegar
-                if (saida_atendimento == 0.0) {
+                if (l.hasFree()) {
                     saida_atendimento = tempo;
                 }
 
@@ -122,7 +117,7 @@ public class Simulador_AD {
                 en.numeroEventos++;
                 // plot do E[N]
                 if (tempo >= tempo_plot_en + intervalo_plot || tempo == tempo_inicial) {
-                    bw_en.append(en.tempoAnterior + "\t" + en.somaAreas + "\t" + en.numeroEventos + "\n");
+//                    bw_en.append(en.tempoAnterior + "\t" + en.somaAreas + "\t" + en.numeroEventos + "\n");
                     tempo_plot_en = tempo; // ou tempo_plot += 100 ?
                 }
                 
@@ -132,7 +127,7 @@ public class Simulador_AD {
                 ewEntrada.numeroEventos++;
                 // plot do E[W]
                 if (tempo >= tempo_plot_ewE + intervalo_plot || tempo == tempo_inicial) {
-                    bw_ewE.append(ewEntrada.tempoAnterior + "\t" + ewEntrada.somaAreas + "\t" + ewEntrada.numeroEventos + "\n");
+//                    bw_ewE.append(ewEntrada.tempoAnterior + "\t" + ewEntrada.somaAreas + "\t" + ewEntrada.numeroEventos + "\n");
                     tempo_plot_ewE = tempo; // ou tempo_plot += 100 ?
                 }
 
@@ -152,7 +147,7 @@ public class Simulador_AD {
                     saida_atendimento = tempo + tempo_atendimento;
                     soma_atendimentos += tempo_atendimento;
                     if (tempo >= tempo_plot_o + intervalo_plot || tempo == tempo_inicial) {
-                        bw_o.append(tempo + "\t" + (soma_atendimentos / tempo) + "\n");
+//                        bw_o.append(tempo + "\t" + (soma_atendimentos / tempo) + "\n");
                         tempo_plot_o = tempo; // ou tempo_plot += 100 ?
                     }
                 } else {
@@ -166,7 +161,7 @@ public class Simulador_AD {
                     en.numeroEventos--;
                     // plot do E[N]
                     if (tempo >= tempo_plot_en + intervalo_plot || tempo == tempo_inicial) {
-                        bw_en.append(en.tempoAnterior + "\t" + en.somaAreas + "\t" + en.numeroEventos + "\n");
+//                        bw_en.append(en.tempoAnterior + "\t" + en.somaAreas + "\t" + en.numeroEventos + "\n");
                         tempo_plot_en = tempo; // ou tempo_plot += 100 ?
                     }
 
@@ -176,7 +171,7 @@ public class Simulador_AD {
                     ewSaida.numeroEventos++;
                     // plot do E[W]
                     if (tempo >= tempo_plot_ewS + intervalo_plot || tempo == tempo_inicial) {
-                        bw_ewS.append(ewSaida.tempoAnterior + "\t" + ewSaida.somaAreas + "\t" +  ewSaida.numeroEventos + "\n");
+//                        bw_ewS.append(ewSaida.tempoAnterior + "\t" + ewSaida.somaAreas + "\t" +  ewSaida.numeroEventos + "\n");
                         tempo_plot_ewS = tempo; // ou tempo_plot += 100 ?
                     }
                 }
@@ -206,9 +201,9 @@ public class Simulador_AD {
 //        System.out.printf("Validação de Little: %.20f\n", (Math.abs(enF - lambda * ew)));
 
         
-        bw_o.close();
-        bw_en.close();
-        bw_ewE.close();
-        bw_ewS.close();
+//        bw_o.close();
+//        bw_en.close();
+//        bw_ewE.close();
+//        bw_ewS.close();
     }
 }
