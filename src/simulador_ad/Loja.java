@@ -13,6 +13,9 @@ public class Loja {
 
     private Caixa[] caixas;
     private int qtd_caixas;
+    
+    /* A head deve ser o caixa com menor */
+    private Caixa head;
 
     public Loja(double qtd_caixas) {
         this.qtd_caixas = (int) this.qtd_caixas;
@@ -57,5 +60,19 @@ public class Loja {
             }
         }
         return null; // nunca chega aqui
+    }
+    
+    /* Essa função deve retornar o caixa com menor tempo de saida atendimento
+     * TODO: melhor complexidade 
+     */
+    Caixa get_head() {
+        double localMin = Double.MAX_VALUE;
+        for (int i = 0; i < this.qtd_caixas; i++) {
+            if (localMin > this.caixas[i].getSaida_atendimento()) {
+                localMin = this.caixas[i].getSaida_atendimento();
+                this.head = this.caixas[i];  // seta a head como quem tem o menor tempo de saida atendimento
+            }
+        }
+        return this.head;
     }
 }
