@@ -10,37 +10,49 @@ package simulador_ad;
  * @author giandoso
  */
 public class Loja {
+
     private Caixa[] caixas;
     private int qtd_caixas;
 
     public Loja(double qtd_caixas) {
-        this.qtd_caixas = (int)this.qtd_caixas;
+        this.qtd_caixas = (int) this.qtd_caixas;
         this.caixas = new Caixa[this.qtd_caixas];
     }
-    
-    
-    public boolean hasFree(){
+
+    /* Essa função deve retornar verdade se existe algum
+     * caixa com saida_atendimento == 0.0
+     * TODO: melhor complexidade 
+     */
+    public boolean hasFree() {
         for (int i = 0; i < this.qtd_caixas; i++) {
-            if(this.caixas[i].getSaida_atendimento() == 0.0){
+            if (this.caixas[i].getSaida_atendimento() == 0.0) {
                 return true;
             }
         }
-        return false;       
+        return false;
     }
 
+    /* Essa função retorna o valor de saida_atendimento do 
+     * caixa com o menor valor
+     * TODO: melhor complexidade 
+     */
     double getMin() {
         double localMin = Double.MAX_VALUE;
         for (int i = 0; i < this.qtd_caixas; i++) {
-            if(localMin > this.caixas[i].getSaida_atendimento()){
-               localMin = this.caixas[i].getSaida_atendimento();
+            if (localMin > this.caixas[i].getSaida_atendimento()) {
+                localMin = this.caixas[i].getSaida_atendimento();
             }
         }
         return localMin;
     }
 
+    /* Essa função deve retornar algum caixa 'livre'
+     * ou seja, qualquer caixa com saida_atendimento == 0.0
+     * TODO melhorar complexidade
+     */
     Caixa getFree() {
         for (int i = 0; i < this.qtd_caixas; i++) {
-            if(this.caixas[i].getSaida_atendimento() == 0.0){
+            if (this.caixas[i].getSaida_atendimento() == 0.0) {
                 return this.caixas[i];
             }
         }
