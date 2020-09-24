@@ -11,11 +11,13 @@ package simulador_ad;
  */
 public class Loja {
 
-    private Caixa[] caixas;
-    private int qtd_caixas;
+    public Caixa[] caixas;
+    public int qtd_caixas;
     
-    /* A head deve ser o caixa com menor */
-    private Caixa head;
+    /* A head deve ser o caixa com menor tempo de saida_atendimento
+     * ps: 0.0 significa caixa livre
+    */
+    Caixa head;
 
     public Loja(double qtd_caixas) {
         this.qtd_caixas = (int) this.qtd_caixas;
@@ -28,7 +30,7 @@ public class Loja {
      */
     public boolean hasFree() {
         for (int i = 0; i < this.qtd_caixas; i++) {
-            if (this.caixas[i].getSaida_atendimento() == 0.0) {
+            if (this.caixas[i].saida_atendimento == 0.0) {
                 return true;
             }
         }
@@ -42,8 +44,8 @@ public class Loja {
     double getMin() {
         double localMin = Double.MAX_VALUE;
         for (int i = 0; i < this.qtd_caixas; i++) {
-            if (localMin > this.caixas[i].getSaida_atendimento()) {
-                localMin = this.caixas[i].getSaida_atendimento();
+            if (localMin > this.caixas[i].saida_atendimento) {
+                localMin = this.caixas[i].saida_atendimento;
             }
         }
         return localMin;
@@ -55,24 +57,25 @@ public class Loja {
      */
     Caixa getFree() {
         for (int i = 0; i < this.qtd_caixas; i++) {
-            if (this.caixas[i].getSaida_atendimento() == 0.0) {
+            if (this.caixas[i].saida_atendimento == 0.0) {
                 return this.caixas[i];
             }
         }
         return null; // nunca chega aqui
     }
     
-    /* Essa função deve retornar o caixa com menor tempo de saida atendimento
+    /* Essa função seta a head como quem tem o menor tempo 
+     * de saida_atendimento diferente de 0. 
      * TODO: melhor complexidade 
      */
-    Caixa get_head() {
+    void update_head() {
         double localMin = Double.MAX_VALUE;
         for (int i = 0; i < this.qtd_caixas; i++) {
-            if (localMin > this.caixas[i].getSaida_atendimento()) {
-                localMin = this.caixas[i].getSaida_atendimento();
-                this.head = this.caixas[i];  // seta a head como quem tem o menor tempo de saida atendimento
-            }
+            Caixa atual = this.caixas[i];
+            if (localMin > atual.saida_atendimento && atual.saida_atendimento != 0.0) {
+                localMin = atual.saida_atendimento;
+                this.head = atual;  
+            }                                                
         }
-        return this.head;
     }
 }

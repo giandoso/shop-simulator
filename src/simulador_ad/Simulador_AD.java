@@ -76,7 +76,7 @@ public class Simulador_AD {
                 // logo, pode-se comecar a atender
                 // o cliente que acaba de chegar
                 if (l.hasFree()) {
-//                    saida_atendimento = tempo;
+                    l.head.saida_atendimento = tempo;
                 }
 
                 chegada_cliente = tempo + (-1.0 / tempo_medio_clientes) * Math.log(aleatorio());
