@@ -92,9 +92,9 @@ public class Simulador_AD {
                 if (fila > 0.0) {
                     fila--;
 
-                    saida_atendimento = (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
+                    l.head.saida_atendimento = (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
                 } else {
-                    saida_atendimento = 0.0;
+                    l.head.saida_atendimento = 0.0;
                 }
             }
         }
