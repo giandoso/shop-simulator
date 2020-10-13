@@ -21,6 +21,7 @@ public class Simulador_AD {
     static long seed = 123456789;
     static Random generator = new Random(seed);
 //    static Random generator = new Random(System.currentTimeMillis());
+    static boolean DEBUG = true;
 
     public static double aleatorio() {
         return 1.00 - generator.nextDouble();
@@ -45,9 +46,9 @@ public class Simulador_AD {
      */
     public static void main(String[] args) throws IOException {
         double tempo = 0.0;
-        double tempo_simulacao = 1200000;
+        double tempo_simulacao = 200;
         double fila = 0.0;
-        double qtd_caixas = 10.0;
+        double qtd_caixas = 2.0;
         Loja l = new Loja(qtd_caixas);
         double tempo_medio_atendimento = qtd_caixas / 60.0;
         double relacao_chegada_capacidade = 0.4;
@@ -69,19 +70,24 @@ public class Simulador_AD {
             }
 
             if (tempo == chegada_cliente) {
+                if (DEBUG)
+                    System.out.printf("Chegada de cliente: %f\n", chegada_cliente);
                 // evento de chegada de cliente 
                 fila++;
+                if (DEBUG)
+                    System.out.printf("fila: %f\n", fila);
 
                 // indica que o caixa esta ocioso
                 // logo, pode-se comecar a atender
                 // o cliente que acaba de chegar
                 if (l.hasFree()) {
-                    l.head.saida_atendimento = tempo;
+                    l.updateHead(tempo);
                 }
 
                 chegada_cliente = tempo + (-1.0 / tempo_medio_clientes) * Math.log(aleatorio());
             } else {
-                // evento executado se houver saida de cliente
+                // evento executado se houver saida de clien
+                // ou ainda se houver chegada de cliente, maste
                 // ou ainda se houver chegada de cliente, mas
                 // o caixa estiver ocioso.
                 // a cabeca da fila nao consiste no cliente em atendimento.
@@ -91,12 +97,22 @@ public class Simulador_AD {
                 // verifica se ha cliente na fila
                 if (fila > 0.0) {
                     fila--;
+                    if (DEBUG)
+                        System.out.printf("fila: %f\n", fila);
 
-                    l.head.saida_atendimento = (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
+                    l.head.saida_atendimento += (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
+                    
+                    if (DEBUG)
+                        System.out.printf("saida de cliente: %f\n", l.head.saida_atendimento);
                 } else {
                     l.head.saida_atendimento = 0.0;
+                    if (DEBUG)
+                        System.out.println("Caixa "+ l.head.label +" ocioso até "+chegada_cliente);
                 }
             }
+            
+            if (DEBUG)
+                System.out.printf("==================\n");
         }
     }
 }

@@ -11,8 +11,10 @@ package simulador_ad;
  */
 public class Caixa {
     double saida_atendimento;
+    int label;
 
-    public Caixa() {
+    public Caixa(int label) {
         this.saida_atendimento = 0.0;
+        this.label = label + 1;
     }
 }

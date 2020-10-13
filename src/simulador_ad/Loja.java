@@ -20,8 +20,12 @@ public class Loja {
     Caixa head;
 
     public Loja(double qtd_caixas) {
-        this.qtd_caixas = (int) this.qtd_caixas;
+        this.qtd_caixas = (int) qtd_caixas;
         this.caixas = new Caixa[this.qtd_caixas];
+        for (int i = 0; i < this.qtd_caixas; i++) {
+            this.caixas[i] = new Caixa(i);
+        }
+        this.getNextHead();
     }
 
     /* Essa função deve retornar verdade se existe algum
@@ -68,14 +72,19 @@ public class Loja {
      * de saida_atendimento diferente de 0. 
      * TODO: melhor complexidade 
      */
-    void update_head() {
+    void getNextHead() {
         double localMin = Double.MAX_VALUE;
         for (int i = 0; i < this.qtd_caixas; i++) {
             Caixa atual = this.caixas[i];
-            if (localMin > atual.saida_atendimento && atual.saida_atendimento != 0.0) {
+            if (localMin > atual.saida_atendimento) {
                 localMin = atual.saida_atendimento;
                 this.head = atual;  
             }                                                
         }
+    }
+    
+    void updateHead(double tempo) {
+        this.head.saida_atendimento = tempo;
+        this.getNextHead();
     }
 }
