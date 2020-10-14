@@ -18,10 +18,10 @@ import java.util.Random;
 public class Simulador_AD {
 
     // seed e funções auxiliares
-    static long seed = 123456789;
+    static long seed = 1605713891;
     static Random generator = new Random(seed);
 //    static Random generator = new Random(System.currentTimeMillis());
-    static boolean DEBUG = true;
+    static boolean DEBUG = false;
 
     public static double aleatorio() {
         return 1.00 - generator.nextDouble();
@@ -46,14 +46,44 @@ public class Simulador_AD {
      */
     public static void main(String[] args) throws IOException {
         double tempo = 0.0;
-        double tempo_simulacao = 200;
+        double tempo_simulacao = 1200000;
         double fila = 0.0;
-        double qtd_caixas = 2.0;
+        
+        // TODO scanf qtd caixas
+        double qtd_caixas = 10.0;
         Loja l = new Loja(qtd_caixas);
         double tempo_medio_atendimento = qtd_caixas / 60.0;
-        double relacao_chegada_capacidade = 0.4;
+        
+        // TODO scanf ocupacao
+        double relacao_chegada_capacidade = 0.6;
+        int oc = 60;
+        
         double tempo_medio_clientes = relacao_chegada_capacidade * tempo_medio_atendimento;
         double chegada_cliente = (double) ((-1.0 / tempo_medio_clientes) * Math.log(aleatorio()));
+        double tempo_inicial = chegada_cliente;
+        double intervalo_plot = 600.0;
+
+        double tempo_plot_o = chegada_cliente;
+        double tempo_plot_en = chegada_cliente;
+        double tempo_plot_ewE = chegada_cliente;
+        double tempo_plot_ewS = chegada_cliente;
+
+        // somar os tempos de atendimento, para no final calcularmos a ocupacao.        
+        double soma_atendimentos = 0.0;
+
+        // variaveis para o calculo de E[N] e E[W]
+        Contador en = new Contador();
+        Contador ewEntrada = new Contador();
+        Contador ewSaida = new Contador();
+
+        File f_o = new File("o" + oc + ".txt");
+        File f_en = new File("en" + oc + ".txt");
+        File f_ewE = new File("ewE" + oc + ".txt");
+        File f_ewS = new File("ewS" + oc + ".txt");
+        BufferedWriter bw_o = new BufferedWriter(new FileWriter(f_o));
+        BufferedWriter bw_en = new BufferedWriter(new FileWriter(f_en));
+        BufferedWriter bw_ewE = new BufferedWriter(new FileWriter(f_ewE));
+        BufferedWriter bw_ewS = new BufferedWriter(new FileWriter(f_ewS));
 
         // logica da simulacao
         while (tempo <= tempo_simulacao) {
@@ -70,12 +100,14 @@ public class Simulador_AD {
             }
 
             if (tempo == chegada_cliente) {
-                if (DEBUG)
+                if (DEBUG) {
                     System.out.printf("Chegada de cliente: %f\n", chegada_cliente);
+                }
                 // evento de chegada de cliente 
                 fila++;
-                if (DEBUG)
+                if (DEBUG) {
                     System.out.printf("fila: %f\n", fila);
+                }
 
                 // indica que o caixa esta ocioso
                 // logo, pode-se comecar a atender
@@ -85,6 +117,26 @@ public class Simulador_AD {
                 }
 
                 chegada_cliente = tempo + (-1.0 / tempo_medio_clientes) * Math.log(aleatorio());
+
+                // calculo do E[N]
+                en.somaAreas += en.numeroEventos * (tempo - en.tempoAnterior);
+                en.tempoAnterior = tempo;
+                en.numeroEventos++;
+                // plot do E[N]
+                if (tempo >= tempo_plot_en + intervalo_plot || tempo == tempo_inicial) {
+                    bw_en.append(en.tempoAnterior + "\t" + en.somaAreas + "\t" + en.numeroEventos + "\n");
+                    tempo_plot_en = tempo; // ou tempo_plot += 100 ?
+                }
+
+                // calculo do E[W]
+                ewEntrada.somaAreas += ewEntrada.numeroEventos * (tempo - ewEntrada.tempoAnterior);
+                ewEntrada.tempoAnterior = tempo;
+                ewEntrada.numeroEventos++;
+                // plot do E[W]
+                if (tempo >= tempo_plot_ewE + intervalo_plot || tempo == tempo_inicial) {
+                    bw_ewE.append(ewEntrada.tempoAnterior + "\t" + ewEntrada.somaAreas + "\t" + ewEntrada.numeroEventos + "\n");
+                    tempo_plot_ewE = tempo; // ou tempo_plot += 100 ?
+                }
             } else {
                 // evento executado se houver saida de clien
                 // ou ainda se houver chegada de cliente, maste
@@ -97,22 +149,83 @@ public class Simulador_AD {
                 // verifica se ha cliente na fila
                 if (fila > 0.0) {
                     fila--;
-                    if (DEBUG)
+                    if (DEBUG) {
                         System.out.printf("fila: %f\n", fila);
+                    }
 
-                    l.head.saida_atendimento += (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
-                    
-                    if (DEBUG)
+                    double tempo_atendimento = (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
+                    l.head.saida_atendimento = tempo + tempo_atendimento;
+                    soma_atendimentos += tempo_atendimento;
+                    if (tempo >= tempo_plot_o + intervalo_plot || tempo == tempo_inicial) {
+                        bw_o.append(tempo + "\t" + (soma_atendimentos / tempo) + "\n");
+                        tempo_plot_o = tempo;
+                    }
+
+                    if (DEBUG) {
                         System.out.printf("saida de cliente: %f\n", l.head.saida_atendimento);
+                    }
                 } else {
                     l.head.saida_atendimento = 0.0;
-                    if (DEBUG)
-                        System.out.println("Caixa "+ l.head.label +" ocioso até "+chegada_cliente);
+                    if (DEBUG) {
+                        System.out.println("Caixa " + l.head.label + " ocioso até " + chegada_cliente);
+                    }
+                }
+                
+                if (en.tempoAnterior < tempo) {
+                    // calculo do E[N]
+                    en.somaAreas += en.numeroEventos * (tempo - en.tempoAnterior);
+                    en.tempoAnterior = tempo;
+                    en.numeroEventos--;
+                    // plot do E[N]
+                    if (tempo >= tempo_plot_en + intervalo_plot || tempo == tempo_inicial) {
+                        bw_en.append(en.tempoAnterior + "\t" + en.somaAreas + "\t" + en.numeroEventos + "\n");
+                        tempo_plot_en = tempo; // ou tempo_plot += 100 ?
+                    }
+
+                    // calculo do E[W]
+                    ewSaida.somaAreas += ewSaida.numeroEventos * (tempo - ewSaida.tempoAnterior);
+                    ewSaida.tempoAnterior = tempo;
+                    ewSaida.numeroEventos++;
+                    // plot do E[W]
+                    if (tempo >= tempo_plot_ewS + intervalo_plot || tempo == tempo_inicial) {
+                        bw_ewS.append(ewSaida.tempoAnterior + "\t" + ewSaida.somaAreas + "\t" +  ewSaida.numeroEventos + "\n");
+                        tempo_plot_ewS = tempo; // ou tempo_plot += 100 ?
+                    }
                 }
             }
-            
-            if (DEBUG)
+
+            if (DEBUG) {
                 System.out.printf("==================\n");
+            }
         }
+        
+        if (l.head.saida_atendimento > tempo) {
+            soma_atendimentos -= (l.head.saida_atendimento - tempo);
+        }
+
+        //fazendo o calculo da ultima area dos graficos antes do termino da simulacao
+        ewSaida.somaAreas += ewSaida.numeroEventos * (tempo - ewSaida.tempoAnterior);
+        ewEntrada.somaAreas += ewEntrada.numeroEventos * (tempo - ewEntrada.tempoAnterior);
+
+        double enF = en.somaAreas / tempo;
+        double ew = (ewEntrada.somaAreas - ewSaida.somaAreas) / ewEntrada.numeroEventos;
+        double lambda = ewEntrada.numeroEventos / tempo;
+        double ocupacao = soma_atendimentos / tempo;
+
+        System.out.printf("Ocupacao: %.2f porcento\n", ocupacao * 100.0);
+        System.out.println("E[N]: " + enF);
+        System.out.println("E[W]: " + ew);
+        System.out.println("Lambda: " + lambda);
+        //Little --> en = lambda * ew
+        //Little --> en - lambda * ew ~ 0.0
+        System.out.printf("Little: |%.13f - (%.13f * %.13f)| = %.13f\n", enF , lambda , ew, (Math.abs(enF - lambda * ew)));
+        System.out.println(Math.abs(enF - lambda * ew));
+//        System.out.printf("Validação de Little: %.20f\n", (Math.abs(enF - lambda * ew)));
+
+        
+        bw_o.close();
+        bw_en.close();
+        bw_ewE.close();
+        bw_ewS.close();
     }
 }
