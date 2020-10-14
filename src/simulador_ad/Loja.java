@@ -5,86 +5,55 @@
  */
 package simulador_ad;
 
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 /**
  *
  * @author giandoso
  */
 public class Loja {
 
-    public Caixa[] caixas;
+//    public Caixa[] caixas;
+    Queue<Double> caixas = new PriorityQueue<>();
     public int qtd_caixas;
-    
-    /* A head deve ser o caixa com menor tempo de saida_atendimento
-     * ps: 0.0 significa caixa livre
-    */
-    Caixa head;
+
 
     public Loja(double qtd_caixas) {
         this.qtd_caixas = (int) qtd_caixas;
-        this.caixas = new Caixa[this.qtd_caixas];
         for (int i = 0; i < this.qtd_caixas; i++) {
-            this.caixas[i] = new Caixa(i);
+            this.caixas.add(0.0);
         }
-        this.getNextHead();
     }
 
     /* Essa função deve retornar verdade se existe algum
      * caixa com saida_atendimento == 0.0
-     * TODO: melhor complexidade 
+     * Complexidade: O[1]
      */
     public boolean hasFree() {
-        for (int i = 0; i < this.qtd_caixas; i++) {
-            if (this.caixas[i].saida_atendimento == 0.0) {
-                return true;
-            }
+        if (this.caixas.peek() == 0.0) {
+            return true;
         }
         return false;
     }
 
-    /* Essa função retorna o valor de saida_atendimento do 
-     * caixa com o menor valor
-     * TODO: melhor complexidade 
-     */
-    double getMin() {
-        double localMin = Double.MAX_VALUE;
-        for (int i = 0; i < this.qtd_caixas; i++) {
-            if (localMin > this.caixas[i].saida_atendimento) {
-                localMin = this.caixas[i].saida_atendimento;
-            }
-        }
-        return localMin;
-    }
-
     /* Essa função deve retornar algum caixa 'livre'
      * ou seja, qualquer caixa com saida_atendimento == 0.0
-     * TODO melhorar complexidade
+     * Complexidade: O[1]
      */
-    Caixa getFree() {
-        for (int i = 0; i < this.qtd_caixas; i++) {
-            if (this.caixas[i].saida_atendimento == 0.0) {
-                return this.caixas[i];
-            }
-        }
-        return null; // nunca chega aqui
+    Double getHead() {
+        return this.caixas.peek();
     }
-    
-    /* Essa função seta a head como quem tem o menor tempo 
-     * de saida_atendimento diferente de 0. 
-     * TODO: melhor complexidade 
+
+    /* Essa função deve atualizar a saida_atendimento
+     * do caixa na cabeça da estruturas
+     * Complexidade: O[2*log(n)]
      */
-    void getNextHead() {
-        double localMin = Double.MAX_VALUE;
-        for (int i = 0; i < this.qtd_caixas; i++) {
-            Caixa atual = this.caixas[i];
-            if (localMin > atual.saida_atendimento) {
-                localMin = atual.saida_atendimento;
-                this.head = atual;  
-            }                                                
-        }
-    }
-    
     void updateHead(double tempo) {
-        this.head.saida_atendimento = tempo;
-        this.getNextHead();
+//        this.head.saida_atendimento = tempo;
+//        this.getNextHead();
+        Double atual = this.caixas.poll();
+        atual = tempo;
+        this.caixas.offer(atual);
     }
 }
