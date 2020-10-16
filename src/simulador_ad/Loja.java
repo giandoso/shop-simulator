@@ -15,14 +15,14 @@ import java.util.Queue;
 public class Loja {
 
 //    public Caixa[] caixas;
-    Queue<Caixa> caixasOciosos = new PriorityQueue<>(new CaixaComparator());
-    Queue<Caixa> caixasOcupados = new PriorityQueue<>(new CaixaComparator());
+    Queue<Caixa> caixas = new PriorityQueue<>(new CaixaComparator());
     public int qtd_caixas;
+
 
     public Loja(double qtd_caixas) {
         this.qtd_caixas = (int) qtd_caixas;
         for (int i = 0; i < this.qtd_caixas; i++) {
-            this.caixasOciosos.add(new Caixa(i));
+            this.caixas.add(new Caixa(i));
         }
     }
 
@@ -31,34 +31,18 @@ public class Loja {
      * Complexidade: O[1]
      */
     public boolean hasFree() {
-        if (!this.caixasOciosos.isEmpty()) {
+        if (this.caixas.peek().saida_atendimento == 0.0) {
             return true;
         }
         return false;
     }
 
-    /* Essa função deve retornar o caixa ocupado que ficará livre primeiro
-     * Complexidade: O[1]
-     */
-    Caixa getHeadOcupado() {
-        return this.caixasOcupados.peek();
-    }
-    
-    /* Essa função deve retornar algum caixa ocioso
-     * Complexidade: O[1]
-     */
-    Caixa getHeadOcioso() {
-        return this.caixasOciosos.peek();
-    }
-    
-    /* Essa função deve retornar algum caixa ocioso
+    /* Essa função deve retornar algum caixa 'livre'
+     * ou seja, qualquer caixa com saida_atendimento == 0.0
      * Complexidade: O[1]
      */
     Caixa getHead() {
-        if (!this.caixasOciosos.isEmpty()) {
-            return this.caixasOciosos.peek();
-        }
-        return this.caixasOcupados.peek();
+        return this.caixas.peek();
     }
 
     /* Essa função deve atualizar a saida_atendimento
@@ -68,20 +52,8 @@ public class Loja {
     void updateHead(double tempo) {
 //        this.head.saida_atendimento = tempo;
 //        this.getNextHead();
-        if (tempo == 0.0) {
-            Caixa atual = this.caixasOcupados.poll();
-            atual.saida_atendimento = tempo;
-            this.caixasOciosos.offer(atual);
-        } else {
-            if (!this.caixasOciosos.isEmpty()) {
-                Caixa atual = this.caixasOciosos.poll();
-                atual.saida_atendimento = tempo;
-                this.caixasOcupados.offer(atual);
-            } else {
-                Caixa atual = this.caixasOcupados.poll();
-                atual.saida_atendimento = tempo;
-                this.caixasOcupados.offer(atual);
-            }
-        }
+        Caixa atual = this.caixas.poll();
+        atual.saida_atendimento = tempo;
+        this.caixas.offer(atual);
     }
 }
