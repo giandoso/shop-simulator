@@ -178,7 +178,8 @@ public class Simulador_AD {
                     ewSaida.numeroEventos++;
                     // plot do E[W]
                     if (tempo >= tempo_plot_ewS + intervalo_plot || tempo == tempo_inicial) {
-                        bw_ewS.append(ewSaida.tempoAnterior + "\t" + ewSaida.somaAreas + "\t" +  ewSaida.numeroEventos + "\n");
+                        String txt = ewSaida.tempoAnterior + "\t" + ewSaida.somaAreas + "\t" +  ewSaida.numeroEventos + "\n";
+                        bw_ewS.append(txt);
                         tempo_plot_ewS = tempo; // ou tempo_plot += 100 ?
                     }
                 }
