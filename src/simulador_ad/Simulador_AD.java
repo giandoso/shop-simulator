@@ -21,7 +21,7 @@ public class Simulador_AD {
     static long seed = 1605713891;
     static Random generator = new Random(seed);
 //    static Random generator = new Random(System.currentTimeMillis());
-    static boolean DEBUG = false;
+    static boolean DEBUG = true;
 
     public static double aleatorio() {
         return 1.00 - generator.nextDouble();
@@ -70,6 +70,9 @@ public class Simulador_AD {
         BufferedWriter bw_en = new BufferedWriter(new FileWriter(f_en));
         BufferedWriter bw_ewE = new BufferedWriter(new FileWriter(f_ewE));
         BufferedWriter bw_ewS = new BufferedWriter(new FileWriter(f_ewS));
+        
+        double tempo_atendimento = 0.0;
+        double tempo_anterior = 0.0;
 
         // logica da simulacao
         while (tempo <= tempo_simulacao) {
@@ -77,17 +80,18 @@ public class Simulador_AD {
             // de modo que a simulacao pode avancar no tempo para
             // a chegada do proximo cliente
             if (l.hasFree()) {
+                tempo_anterior = tempo;
                 tempo = chegada_cliente;
             } else {
                 // checa se chegada cliente é menor do que saida_atendimento 
                 // de qualquer caixa da loja 
-                double saida_atendimento = l.getHead();
+                double saida_atendimento = l.getHead().saida_atendimento;
                 tempo = minimo(chegada_cliente, saida_atendimento);
             }
 
             if (tempo == chegada_cliente) {
                 if (DEBUG) {
-                    System.out.printf("Chegada de cliente: %f\n", chegada_cliente);
+                    System.out.printf("Chegada de cliente: %f \t no caixa %d\n", chegada_cliente,  l.getHead().label);
                 }
                 // evento de chegada de cliente 
                 fila++;
@@ -139,7 +143,10 @@ public class Simulador_AD {
                         System.out.printf("fila: %f\n", fila);
                     }
 
-                    double tempo_atendimento = (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
+                    tempo_atendimento = (-1.0 / tempo_medio_atendimento) * Math.log(aleatorio());
+                    if (DEBUG) {
+                        System.out.printf("Saída de cliente: %f \t no caixa %d\n", tempo + tempo_atendimento, l.getHead().label);
+                    }
                     l.updateHead(tempo + tempo_atendimento);
                     soma_atendimentos += tempo_atendimento;
                     if (tempo >= tempo_plot_o + intervalo_plot || tempo == tempo_inicial) {
@@ -147,9 +154,6 @@ public class Simulador_AD {
                         tempo_plot_o = tempo;
                     }
 
-                    if (DEBUG) {
-                        System.out.printf("saida de cliente: %f\n", l.getHead());
-                    }
                 } else {
                     l.updateHead(0.0);
                     if (DEBUG) {
@@ -185,8 +189,8 @@ public class Simulador_AD {
             }
         }
         
-        if (l.getHead() > tempo) {
-            soma_atendimentos -= (l.getHead() - tempo);
+        if (l.getHead().saida_atendimento > tempo) {
+            soma_atendimentos -= (l.getHead().saida_atendimento - tempo);
         }
 
         //fazendo o calculo da ultima area dos graficos antes do termino da simulacao
@@ -227,22 +231,22 @@ public class Simulador_AD {
      */
     public static void main(String[] args) throws IOException {
         System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.4: ");
-        simulador(5.0, 0.4);
-        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.8: ");
-        simulador(5.0, 0.8);
-        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.9: ");
-        simulador(5.0, 0.9);
-        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.99: ");
         simulador(5.0, 0.99);
-        
-        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.4: ");
-        simulador(10.0, 0.4);
-        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.8: ");
-        simulador(10.0, 0.8);
-        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.9: ");
-        simulador(10.0, 0.9);
-        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.99: ");
-        simulador(10.0, 0.99);
+//        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.8: ");
+//        simulador(5.0, 0.8);
+//        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.9: ");
+//        simulador(5.0, 0.9);
+//        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.99: ");
+//        simulador(5.0, 0.99);
+//        
+//        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.4: ");
+//        simulador(10.0, 0.4);
+//        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.8: ");
+//        simulador(10.0, 0.8);
+//        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.9: ");
+//        simulador(10.0, 0.9);
+//        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.99: ");
+//        simulador(10.0, 0.99);
         
         
     }
