@@ -18,10 +18,10 @@ import java.util.Random;
 public class Simulador_AD {
 
     // seed e funções auxiliares
-    static long seed = 1605713891;
+    static long seed = 1605743891;
     static Random generator = new Random(seed);
 //    static Random generator = new Random(System.currentTimeMillis());
-    static boolean DEBUG = true;
+    static boolean DEBUG = false;
 
     public static double aleatorio() {
         return 1.00 - generator.nextDouble();
@@ -155,10 +155,10 @@ public class Simulador_AD {
                     }
 
                 } else {
-                    l.updateHead(0.0);
                     if (DEBUG) {
-                        System.out.println("Caixa ocioso até " + chegada_cliente);
+                        System.out.println("Caixa " + l.getHead().label + " ocioso até " + chegada_cliente);
                     }
+                    l.updateHead(0.0);
                 }
                 
                 if (en.tempoAnterior < tempo) {
@@ -231,22 +231,22 @@ public class Simulador_AD {
      */
     public static void main(String[] args) throws IOException {
         System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.4: ");
+        simulador(5.0, 0.4);
+        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.8: ");
+        simulador(5.0, 0.8);
+        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.9: ");
+        simulador(5.0, 0.9);
+        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.99: ");
         simulador(5.0, 0.99);
-//        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.8: ");
-//        simulador(5.0, 0.8);
-//        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.9: ");
-//        simulador(5.0, 0.9);
-//        System.out.println("SIMULAÇÃO DE 5 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.99: ");
-//        simulador(5.0, 0.99);
-//        
-//        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.4: ");
-//        simulador(10.0, 0.4);
-//        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.8: ");
-//        simulador(10.0, 0.8);
-//        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.9: ");
-//        simulador(10.0, 0.9);
-//        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.99: ");
-//        simulador(10.0, 0.99);
+        
+        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.4: ");
+        simulador(10.0, 0.4);
+        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.8: ");
+        simulador(10.0, 0.8);
+        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.9: ");
+        simulador(10.0, 0.9);
+        System.out.println("SIMULAÇÃO DE 10 CAIXAS COM RELAÇÃO ENTRE A CHEGADA E CAPACIDADE TOTAL DE ATENDIMENTO IGUAL A 0.99: ");
+        simulador(10.0, 0.99);
         
         
     }
